@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Медицинское расписание занятий</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(to bottom, #e8f4f8, #d0e8f2);
+            color: #2c3e50;
+            min-height: 100vh;
+            padding: 15px;
+            -webkit-text-size-adjust: 100%;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            width: 100%;
+        }
+        
+        header {
+            background: linear-gradient(to right, #2c6a92, #4a9cc9);
+            color: white;
+            padding: 20px 15px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: "⚕";
+            position: absolute;
+            top: 10px;
+            left: 15px;
+            font-size: 2rem;
+            opacity: 0.2;
+        }
+        
+        header::after {
+            content: "⚕";
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 2rem;
+            opacity: 0.2;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        
+        .group-info {
+            background: #f1f9ff;
+            padding: 12px 15px;
+            text-align: center;
+            border-bottom: 2px solid #d0e8f2;
+            font-weight: bold;
+            color: #2c6a92;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            font-size: 14px;
+        }
+        
+        .week-navigation {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 12px 10px;
+            background: #f8fcff;
+            border-bottom: 1px solid #e0eef7;
+            gap: 12px;
+        }
+        
+        .week-btn {
+            padding: 10px 15px;
+            background-color: #e4f2fb;
+            color: #2c6a92;
+            border: 1px solid #c5e1f0;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+            -webkit-appearance: none;
+            touch-action: manipulation;
+            pointer-events: auto;
+        }
+        
+        .week-btn:hover {
+            background-color: #c5e1f0;
+        }
+        
+        .week-display {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #2c6a92;
+            min-width: 140px;
+            text-align: center;
+        }
+        
+        .date-range {
+            font-size: 0.85rem;
+            color: #5d6d7e;
+            margin-top: 4px;
+        }
+        
+        .schedule {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background-color: #e0eef7;
+        }
+        
+        .day {
+            background: white;
+            padding: 12px;
+            min-height: auto;
+        }
+        
+        .day-title {
+            text-align: center;
+            padding: 10px;
+            margin-bottom: 12px;
+            background: #f1f9ff;
+            border-radius: 8px;
+            color: #2c6a92;
+            font-weight: bold;
+            border-bottom: 2px solid #4a9cc9;
+            font-size: 16px;
+        }
+        
+        .lecture {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            background-color: #f7fbfe;
+            border-left: 4px solid #4a9cc9;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+        }
+        
+        .lecture-time {
+            font-size: 0.8rem;
+            color: #4a9cc9;
+            margin-bottom: 4px;
+            font-weight: bold;
+        }
+        
+        .lecture-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: #2c3e50;
+            font-size: 0.9rem;
+            line-height: 1.3;
+        }
+        
+        .lecture-info {
+            font-size: 0.75rem;
+            color: #5d6d7e;
+            margin-bottom: 3px;
+            line-height: 1.3;
+        }
+        
+        .medical-icon {
+            display: inline-block;
+            margin-right: 4px;
+            color: #4a9cc9;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 15px;
+            background: #2c6a92;
+            color: white;
+            font-size: 0.8rem;
+        }
+        
+        .empty-day {
+            text-align: center;
+            color: #9ab3c5;
+            padding: 15px;
+            font-style: italic;
+            font-size: 0.9rem;
+        }
+        
+        .lecture.lecture {
+            border-left-color: #4a9cc9;
+        }
+        
+        .lecture.practice {
+            border-left-color: #6ac66e;
+        }
+        
+        .lecture.lab {
+            border-left-color: #e79c4b;
+        }
+        
+        /* Адаптивность */
+        @media (max-width: 992px) {
+            .schedule {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .schedule {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .week-navigation {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .group-info {
+                flex-direction: column;
+                gap: 8px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            body {
+                padding: 10px;
+            }
+            
+            .schedule {
+                grid-template-columns: 1fr;
+            }
+            
+            header {
+                padding: 15px 10px;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .subtitle {
+                font-size: 0.9rem;
+            }
+            
+            .week-btn {
+                padding: 8px 12px;
+                font-size: 13px;
+            }
+            
+            .week-display {
+                font-size: 1rem;
+                min-width: 120px;
+            }
+            
+            .date-range {
+                font-size: 0.8rem;
+            }
+        }
+        
+        /* Safari fixes */
+        @supports (-webkit-touch-callout: none) {
+            .day {
+                min-height: auto !important;
+            }
+            
+            .lecture {
+                transform: translateZ(0);
+            }
+            
+            .week-btn {
+                padding: 12px 15px;
+            }
+            
+            .container {
+                width: 100% !important;
+                overflow-x: hidden;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Расписание занятий</h1>
+            <p class="subtitle">Педиатрический факультет • Осенний семестр 2025/2026</p>
+        </header>
+        
+        <div class="group-info">
+            <span>Группа: 2106 💙</span>
+            <span>Направление: 31.05.02 Педиатрия</span>
+        </div>
+        
+        <div class="week-navigation">
+            <button class="week-btn" id="prev-week">
+                <i class="fas fa-chevron-left"></i> Предыдущая
+            </button>
+            
+            <div class="week-display">
+                <div id="week-title">Неделя 1</div>
+                <div class="date-range" id="date-range">1 сен - 7 сен 2025</div>
+            </div>
+            
+            <button class="week-btn" id="next-week">
+                Следующая <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+        
+        <div class="schedule" id="schedule">
+            <!-- Расписание генерируется JS -->
+        </div>
+        
+        <footer>
+            <p>Медицинский университет • Расписание может изменяться • 2025/2026 учебный год</p>
+        </footer>
+    </div>
+
+    <script>
+        // Полные данные о неделях
+        const weeks = [
+            { number: 1, start: '2025-09-01', end: '2025-09-07' },
+            { number: 2, start: '2025-09-08', end: '2025-09-14' },
+            { number: 3, start: '2025-09-15', end: '2025-09-21' },
+            { number: 4, start: '2025-09-22', end: '2025-09-28' },
+            { number: 5, start: '2025-09-29', end: '2025-10-05' },
+            { number: 6, start: '2025-10-06', end: '2025-10-12' },
+            { number: 7, start: '2025-10-13', end: '2025-10-19' },
+            { number: 8, start: '2025-10-20', end: '2025-10-26' },
+            { number: 9, start: '2025-10-27', end: '2025-11-02' },
+            { number: 10, start: '2025-11-03', end: '2025-11-09' },
+            { number: 11, start: '2025-11-10', end: '2025-11-16' },
+            { number: 12, start: '2025-11-17', end: '2025-11-23' },
+            { number: 13, start: '2025-11-24', end: '2025-11-30' },
+            { number: 14, start: '2025-12-01', end: '2025-12-07' },
+            { number: 15, start: '2025-12-08', end: '2025-12-14' },
+            { number: 16, start: '2025-12-15', end: '2025-12-21' },
+            { number: 17, start: '2025-12-22', end: '2025-12-28' },
+            { number: 18, start: '2025-12-29', end: '2026-01-04' }
+        ];
+
+        // Полные данные о занятиях
+        const scheduleData = {
+            "Понедельник": [
+                { time: "08:00 - 08:45", name: "Лекция: Экономика", info: 'НУК, ауд. "Ректор Хамитов"', weeks: [3,5,7,9,11], type: "lecture" },
+                { time: "09:50 - 10:35", name: "Лекция: Введение в специальность", info: 'НУК, ауд. "Ректор Хамитов"', weeks: [2,4,6], type: "lecture" },
+                { time: "09:50 - 10:35", name: "Лекция: Информатика", info: 'НУК, ауд. "Ректор Хамитов"', weeks: [3,5,7,9,11], type: "lecture" },
+                { time: "09:50 - 10:35", name: "Лекция: Формирование ЗОЖ у детей", info: 'НУК, ауд. "Ректор Хамитов"', weeks: [12,13,14], type: "lecture" },
+                { time: "12:20 - 13:05", name: "Физика, математика", info: "", weeks: [2,3,4,5,6,7,8,9,10,11,12,13,14,15,16], type: "lecture" }
+            ],
+            "Вторник": [
+                { time: "08:00 - 08:45", name: "Лекция: История России", info: "НУК, НУК-3", weeks: [1,2,3,4,5,6,7,8,9,11,12,13], type: "lecture" },
+                { time: "09:50 - 10:35", name: "Лекция: История медицины", info: 'НУК, ауд. "Добровольцы"', weeks: [1,3,5,7,9], type: "lecture" },
+                { time: "09:50 - 10:35", name: "Физкультура", info: 'НУК, ауд. "Добровольцы"', weeks: [2,6,8], type: "practice" },
+                { time: "09:50 - 10:35", name: "Информационная культура", info: "Добровольцы", weeks: [4], type: "lecture" },
+                { time: "12:20 - 13:05", name: "Экономика", info: "", weeks: [3,4,5,6,7,8,9,11,12,13,14,15,16], type: "lecture" },
+                { time: "14:10 - 14:55", name: "Латинский язык", info: "", weeks: [1,2,3,4,5,6,7,8,9,11,12,13,14,15,16], type: "lecture" }
+            ],
+            "Среда": [
+                { time: "08:50 - 09:35", name: "Биология", info: "", weeks: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15], type: "lecture" },
+                { time: "12:20 - 13:05", name: "Элективные дисциплины по физкультуре и спорту", info: "+2 нед по 2 ак.ч.", weeks: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17], type: "practice" },
+                { time: "15:00 - 15:45", name: "Формирование здорового образа жизни у детей", info: "Чётные недели", weeks: [2,4,6,8,10,12,14], type: "practice" }
+            ],
+            "Четверг": [
+                { time: "08:00 - 08:45", name: "Лекция: История России", info: 'НУК, ауд. "Ректор Хамитов"', weeks: [1,2,3,4,5,6,7,8,9,11,12,13], type: "lecture" },
+                { time: "09:50 - 10:35", name: "Лекция: Биология", info: 'НУК, ауд. "Ректор Хамитов"', weeks: [2,4,6,8,12,14,16], type: "lecture" },
+                { time: "09:50 - 10:35", name: "Лекция: Физика, математика", info: 'НУК, ауд. "Ректор Хамитов"', weeks: [1,3,5,7,9,11,13,15], type: "lecture" },
+                { time: "12:20 - 13:05", name: "Анатомия человека", info: "", weeks: [1,2,3,4,5,6,7,8,9,11,12,13,14,15,16,17], type: "lecture" },
+                { time: "16:00 - 16:45", name: "История России", info: "+1 нед по 2 ак.ч.", weeks: [1,2,3,4,5,6,7,8,9,11,12,13,14,15,16,17], type: "lecture" }
+            ],
+            "Пятница": [
+                { time: "08:00 - 08:45", name: "Физическая культура и спорт", info: "", weeks: [1,2,3,4,5,6,7], type: "practice" },
+                { time: "09:50 - 10:35", name: "Лекция: Анатомия человека", info: "", weeks: [1,2,3,4,5,6,7,8,9,10], type: "lecture" },
+                { time: "12:20 - 13:05", name: "Иностранный язык", info: "+1 нед по 2 ак.ч.", weeks: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17], type: "lecture" },
+                { time: "14:10 - 14:55", name: "Введение в специальность", info: "", weeks: [1,2,3,4,5,6,7], type: "lecture" },
+                { time: "14:10 - 14:55", name: "Информационная культура", info: "", weeks: [10], type: "lecture" },
+                { time: "16:00 - 16:45", name: "История медицины", info: "", weeks: [1,2,3,4,5,6,7,8,9,10,11,12,13], type: "lecture" }
+            ],
+            "Суббота": [
+                { time: "08:00 - 08:45", name: "Информатика", info: "", weeks: [1,2,3,4,5,6,7,8,9,10], type: "lecture" }
+            ],
+            "Воскресенье": []
+        };
+
+        let currentWeek = 1;
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const options = { day: 'numeric', month: 'short' };
+            return date.toLocaleDateString('ru-RU', options).replace('.', '');
+        }
+
+        function updateWeekDisplay() {
+            const week = weeks.find(w => w.number === currentWeek);
+            document.getElementById('week-title').textContent = `Неделя ${currentWeek}`;
+            document.getElementById('date-range').textContent = `${formatDate(week.start)} - ${formatDate(week.end)} ${week.start.substring(0,4)}`;
+            
+            renderSchedule();
+        }
+
+        function renderSchedule() {
+            const scheduleElement = document.getElementById('schedule');
+            scheduleElement.innerHTML = '';
+            
+            Object.keys(scheduleData).forEach(day => {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'day';
+                
+                const dayTitle = document.createElement('h2');
+                dayTitle.className = 'day-title';
+                dayTitle.textContent = day;
+                dayElement.appendChild(dayTitle);
+                
+                const dayLectures = scheduleData[day].filter(lecture => 
+                    lecture.weeks.includes(currentWeek)
+                );
+                
+                if (dayLectures.length === 0) {
+                    const emptyElement = document.createElement('div');
+                    emptyElement.className = 'empty-day';
+                    emptyElement.textContent = 'Нет занятий';
+                    dayElement.appendChild(emptyElement);
+                } else {
+                    dayLectures.sort((a, b) => {
+                        const timeA = a.time.split(' - ')[0];
+                        const timeB = b.time.split(' - ')[0];
+                        return timeA.localeCompare(timeB);
+                    });
+                    
+                    dayLectures.forEach(lecture => {
+                        const lectureElement = document.createElement('div');
+                        lectureElement.className = `lecture ${lecture.type}`;
+                        
+                        const timeElement = document.createElement('div');
+                        timeElement.className = 'lecture-time';
+                        timeElement.innerHTML = `<span class="medical-icon">⏰</span> ${lecture.time}`;
+                        
+                        const nameElement = document.createElement('div');
+                        nameElement.className = 'lecture-name';
+                        nameElement.textContent = lecture.name;
+                        
+                        const infoElement = document.createElement('div');
+                        infoElement.className = 'lecture-info';
+                        if (lecture.info) {
+                            infoElement.innerHTML = `<span class="medical-icon">📚</span> ${lecture.info}`;
+                        }
+                        
+                        lectureElement.appendChild(timeElement);
+                        lectureElement.appendChild(nameElement);
+                        lectureElement.appendChild(infoElement);
+                        
+                        dayElement.appendChild(lectureElement);
+                    });
+                }
+                
+                scheduleElement.appendChild(dayElement);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            updateWeekDisplay();
+            
+            document.getElementById('prev-week').addEventListener('click', function() {
+                if (currentWeek > 1) {
+                    currentWeek--;
+                    updateWeekDisplay();
+                }
+            });
+            
+            document.getElementById('next-week').addEventListener('click', function() {
+                if (currentWeek < weeks.length) {
+                    currentWeek++;
+                    updateWeekDisplay();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
